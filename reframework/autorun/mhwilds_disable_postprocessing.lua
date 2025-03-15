@@ -1,4 +1,4 @@
---v1.1.3
+--v1.2.0B
 local statics = require("utility/Statics")
 local TAAStrength = statics.generate("via.render.ToneMapping.TemporalAA", true)
 local localExposureType = statics.generate("via.render.ToneMapping.LocalExposureType", true)
@@ -12,26 +12,33 @@ local settings =
     LDRPostProcessEnable = true,
     colorCorrect = true,
     lensDistortionEnable = false,
-    localExposure = false,
-    localExposureBlurredLuminance = true,
+    localExposure = true,
+    localExposureBlurredLuminance = false,
     customContrastEnable = false,
     filmGrain = true,
     lensFlare = true,
     godRay = true,
     fog = true,
     volumetricFog = true,
-    customContrast = 1.0
+    useWhitePaperNitsForOverlay = false,
+    customContrast = 1.0,
+    gamma = 1.0,
+    gammaOverlay = 1.0,
+    gammaOverlayHDR = 1.0,
+    lowerLimit = 0.0,
+    upperLimit = 1.0,
+    whitePaperNits = 100.0,
+    whitePaperNitsOverlay = 100.0
 }
 
 local apply = false
 local save = false
-local changed = false
 local initialized = false
 
 --Singleton and manager types
 local cameraManager, cameraManagerType, graphicsManager, graphicsManagerType
 --gameobject, component, and type definitions
-local camera, cameraGameObject, LDRPostProcess, colorCorrectComponent, tonemapping, tonemappingType, graphicsSetting
+local camera, cameraGameObject, LDRPostProcess, colorCorrectComponent, tonemapping, tonemappingType, graphicsSetting, displaySettings
 
 
 --Saves settings to json
@@ -58,6 +65,16 @@ local function get_component(game_object, type_name)
     return game_object:call("getComponent(System.Type)", t)
 end
 
+local function ResetBrightness()
+    settings.gamma = 1.0
+    settings.gammaOverlay = 1.0
+    settings.lowerLimit = 0.0
+    settings.upperLimit = 1.0
+    settings.gammaOverlayHDR = 1.0
+    settings.whitePaperNits = 100.0
+    settings.whitePaperNitsOverlay = 100.0
+end
+
 
 --Apply settings
 local function ApplySettings()
@@ -78,6 +95,18 @@ local function ApplySettings()
     else
         tonemapping:call("set_Contrast", 0.3)
     end
+
+    --Set gamma and brightness
+    displaySettings:call("set_UseSDRBrightnessOptionForOverlay", true)
+    displaySettings:call("set_Gamma", settings.gamma)
+    displaySettings:call("set_GammaForOverlay", settings.gammaOverlay)
+    displaySettings:call("set_OutputLowerLimit", settings.lowerLimit)
+    displaySettings:call("set_OutputUpperLimit", settings.upperLimit)
+    displaySettings:call("set_GammaForHDR", settings.gammaOverlayHDR)
+    displaySettings:call("set_UseWhitePaperNitsForOverlay", settings.useWhitePaperNitsForOverlay)
+    displaySettings:call("set_WhitePaperNits", settings.whitePaperNits)
+    displaySettings:call("set_WhitePaperNitsForOverlay", settings.whitePaperNitsOverlay)
+    displaySettings:call("updateRequest")
     
     --Set graphics setting
     graphicsSetting:call("set_Fog_Enable", settings.fog)
@@ -114,6 +143,7 @@ local function Initialize()
     tonemapping = get_component(cameraGameObject, "via.render.ToneMapping")
     tonemappingType = sdk.find_type_definition("via.render.ToneMapping")
     graphicsSetting = graphicsManager:call("get_NowGraphicsSetting")
+    displaySettings = graphicsManager:call("get_DisplaySettings")
     log.info("[DISABLE POST PROCESSING] Component get successful")
 
     --Create hooks and register callback
@@ -137,9 +167,13 @@ re.on_frame(function() if initialized == false then Initialize() end end)
 --Script generated UI
 re.on_draw_ui(function()
     if imgui.tree_node("Post Processing Settings") then
-        changed = false
+        local changed = false
 
-        --Settings menu
+        --Save settings when clicking on save box
+        changed = imgui.small_button("Save settings")
+        if changed == true then SaveSettings() end
+        imgui.new_line()
+
         changed, settings.TAA = imgui.checkbox("TAA enabled", settings.TAA)
         if changed == true then ApplySettings() end
         changed, settings.jitter = imgui.checkbox("TAA jitter enabled", settings.jitter)
@@ -159,7 +193,31 @@ re.on_draw_ui(function()
         if changed == true then ApplySettings() end
         imgui.new_line()
 
+        imgui.text("Gamma & Brightness")
+        changed, settings.gamma = imgui.drag_float("Gamma", settings.gamma, 0.001, 0.001, 5.0)
+        if changed == true then ApplySettings() end
+        changed, settings.gammaOverlay = imgui.drag_float("UI gamma", settings.gammaOverlay, 0.001, 0.001, 5.0)
+        if changed == true then ApplySettings() end
+        changed, settings.upperLimit = imgui.drag_float("Max brightness", settings.upperLimit, 0.001, 0.001, 10.0)
+        if changed == true then ApplySettings() end
+        changed, settings.lowerLimit = imgui.drag_float("Min brightness", settings.lowerLimit, 0.001, -5.0, 5.0)
+        if changed == true then ApplySettings() end
+        changed = imgui.small_button("Reset gamma & brightness")
+        if changed == true then ResetBrightness() ApplySettings() end
+        imgui.text("HDR")
+        changed, settings.useWhitePaperNitsForOverlay = imgui.checkbox("Use white paper nits for UI", settings.useWhitePaperNitsForOverlay)
+        if changed == true then ApplySettings() end
+        changed, settings.gammaOverlayHDR = imgui.drag_float("HDR UI gamma", settings.gammaOverlayHDR, 0.001, 0.001, 5.0)
+        if changed == true then ApplySettings() end
+        changed, settings.whitePaperNits = imgui.drag_float("White paper nits", settings.whitePaperNits, 0.1, 1.0, 2000.0)
+        if changed == true then ApplySettings() end
+        changed, settings.whitePaperNitsOverlay = imgui.drag_float("White paper nits UI", settings.whitePaperNitsOverlay, 0.1, 1.0, 2000.0)
+        if changed == true then ApplySettings() end
+        imgui.new_line()
+
         imgui.text("Graphics Settings")
+        apply = imgui.small_button("Apply graphics settings")
+        if apply == true then ApplySettings() apply = false end
         changed, settings.lensDistortionEnable = imgui.checkbox("Lens distortion enabled", settings.lensDistortionEnable)
         if changed == true then ApplySettings() end
         changed, settings.fog = imgui.checkbox("Fog enabled", settings.fog)
@@ -174,24 +232,10 @@ re.on_draw_ui(function()
         if changed == true then ApplySettings() end
         imgui.spacing()
 
-        --Apply graphics settings when clicking on apply box
-        changed, apply = imgui.checkbox("Apply graphics settings", apply)
-        if apply == true then
-            ApplySettings()
-            apply = false
-        end
         imgui.text("WARNING: applying graphics settings will set")
         imgui.text("ambient lighting to high due to a bug in the game")
         imgui.text("until returning to title or restarting the game")
-        imgui.new_line()
-
-        --Save settings when clicking on save box
-        changed, save = imgui.checkbox("Save settings", save)
-        if save == true then
-            SaveSettings()
-            save = false
-        end
-        imgui.new_line()
+        imgui.spacing()
 
         imgui.tree_pop()
     end
