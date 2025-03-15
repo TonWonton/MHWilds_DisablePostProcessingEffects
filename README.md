@@ -55,7 +55,7 @@ Disabling color correct and the other filters removes the overly bright, low con
 ### v1.1.3
 - Fixed brightness issue during specific frenzy phase and apex monster's super attack
 - Fixed lua error on startup
-- Fixed widescreen fix not working
+- Fixed ultrawide fix not working
 - Fixed settings not applying for some
 
 ### v1.1.2
