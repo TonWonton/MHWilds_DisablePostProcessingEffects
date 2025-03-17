@@ -3,10 +3,9 @@ A REFramework script that lets you disable different filters and post processing
 
 This script lets you disable/enable all the options included in the script through the REFramework UI under the "Script Generated UI", which lets you customize the visuals of the game to your liking. It also allows you to save your configuration by clicking "Save settings" at the bottom, and will load those settings automatically after that.
 
-By default, the script disables lens distortion and local exposure, which disables two of the filters that contribute the most to making the game look blurry and washed out.
+By default, the script disables lens distortion and blurred luminance, which disables two of the filters that contribute the most to making the game look blurry and washed out.
 
-This script also lets you disable the games color correction which makes the game more vibrant and improves dynamic range and contrast (disabling color correction will make the game significantly darker. Turn up the brightness in game from Options > Display > Brightness if you decide to turn it off).
-Disabling color correct and the other filters removes the overly bright, low contrast, washed out look, which makes for a better starting point for further visual customization such as ReShade.
+This script also lets you disable the games color correction which makes the game more vibrant and improves dynamic range and contrast (disabling color correction will make the game significantly darker. Turn up the brightness in game from Options > Display > Brightness if you decide to turn it off, or test the v1.2.0B test version which has options for adjusting brightness).
 
 
 ## Features
@@ -16,19 +15,20 @@ Disabling color correct and the other filters removes the overly bright, low con
 - Disable color correction
 - Disable lens distortion
 - Disable local exposure
-  - Disable the sharpening filter tied to local exposure
+﻿- Disable the sharpening filter tied to local exposure
 - Set custom contrast
+- Set custom brightness for game and UI separately
 - Toggle volumetric fog
 
 
 ## Prerequisites
-- REFramework [Nexus](https://www.nexusmods.com/monsterhunterwilds/mods/93) | [GitHub](https://github.com/praydog/REFramework)
+- REFramework Nexus | GitHub
 
 
 ## Installation
 - Install REFramework
-- Download the script [Nexus](https://www.nexusmods.com/monsterhunterwilds/mods/221) | [GitHub](https://github.com/TonWonton/MHWilds_DisablePostProcessingEffects/releases) and extract the reframework folder into the game folder (where MonsterHunterWilds.exe is located)
-- mhwilds_disable_postprocessing.lua and utility folder should be placed into \(game folder)\reframework\autorun\
+- Download the script Nexus | GitHub and extract the reframework folder into the game folder(where MonsterHunterWilds.exe is located)
+﻿- mhwilds_disable_postprocessing.lua and utility folder should be placed into \(game folder)\reframework\autorun\
 
 ### Uninstall
 - Open the game folder and go into: \(game folder)\reframework\autorun\
@@ -40,20 +40,32 @@ Disabling color correct and the other filters removes the overly bright, low con
 
 
 ## Notes
-- Disabling color correction will make the game significantly darker. Increase the brightness from the in game options at Options > Display > Brightness if you want to disable color correct
-﻿- If it is still too dark you can also try enabling local exposure
+- Disabling color correction will make the game significantly darker
+﻿- If it is too dark you can try enabling local exposure
+﻿- Or enable custom gamma & contrast, then increase brightness and/or gamma
+﻿﻿- For HDR: increase the brightness from the in game options menu instead
 
 - Some of the settings seem to have no effect (fog, film grain, lens flare, godray)
 
 
 ## Known issues
 - Flickering might occur if you have frame gen (maybe only DLSS FG) and local exposure ON + blurred luminance OFF when doing specific actions (entering tent, cooking, fast traveling, talking to some NPCs)
-- Lens distortion might make the UI misaligned. More noticable on ultrawide monitors. Try to use the REFramework UI > graphics, and change the ultrawide options there
+- Disabling lens distortion might make the UI misaligned. More noticable on ultrawide monitors. Try to use the REFramework UI > graphics, and change the ultrawide options there
 
 
 ## Changelog
+### v1.2.0
+- Added options for SDR brightness
+    - Gamma
+    - Max and min brightness
+    - UI gamma
+    - UI max and min brightness
+- Removed HDR brightness options due to problems (use in game brightness options instead for now)
+- Changed script UI
+- Changed defaults to local exposure ON + blurred luminance OFF, since black flicker bug cause is known
+
 ### v1.1.3
-- Fixed brightness issue during specific frenzy phase and apex monster's super attack
+- Fixed brightness issue during specific frenzy phase and apex monster's super attack if color correct was disabled
 - Fixed lua error on startup
 - Fixed ultrawide fix not working
 - Fixed settings not applying for some
@@ -95,4 +107,4 @@ Disabling color correct and the other filters removes the overly bright, low con
 ﻿- Volumetric fog
 ﻿- Film grain
 ﻿- Lens flare
-﻿- Godray 
+﻿- Godray
