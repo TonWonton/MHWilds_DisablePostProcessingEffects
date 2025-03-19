@@ -22,12 +22,12 @@ This script also lets you disable the color correction which makes the game more
 
 
 ## Prerequisites
-- REFramework Nexus | GitHub
+- REFramework [Nexus](https://www.nexusmods.com/monsterhunterwilds/mods/93) | [GitHub](https://github.com/praydog/REFramework)
 
 
 ## Installation
 - Install REFramework
-- Download the script Nexus | GitHub and extract the reframework folder into the game folder(where MonsterHunterWilds.exe is located)
+- Download the script [Nexus](https://www.nexusmods.com/monsterhunterwilds/mods/221) | [GitHub](https://github.com/TonWonton/MHWilds_DisablePostProcessingEffects/releases) and extract the reframework folder into the game folder(where MonsterHunterWilds.exe is located)
 ﻿- mhwilds_disable_postprocessing.lua and utility folder should be placed into \(game folder)\reframework\autorun\
 
 ### Uninstall
