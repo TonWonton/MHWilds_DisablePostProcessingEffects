@@ -5,7 +5,7 @@ This script lets you disable/enable all the options included in the script throu
 
 By default, the script disables lens distortion and blurred luminance, which disables two of the filters that contribute the most to making the game look blurry and washed out.
 
-This script also lets you disable the games color correction which makes the game more vibrant and improves dynamic range and contrast (disabling color correction will make the game significantly darker. Turn up the brightness in game from Options > Display > Brightness if you decide to turn it off, or test the v1.2.0B test version which has options for adjusting brightness).
+This script also lets you disable the color correction which makes the game more vibrant and improves dynamic range and contrast (disabling color correction will make the game significantly darker. Turn on local exposure or increase the brightness from the script if you want to disable color correction.
 
 
 ## Features
