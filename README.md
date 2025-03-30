@@ -54,6 +54,10 @@ This script also lets you disable the color correction which makes the game more
 
 
 ## Changelog
+### v1.2.1
+- Changed TAA strength to the game default "Manual" instead of "Strong" if you have TAA enabled in the script
+- Added global mod header for better compatibility with Lite Environment and future mods
+
 ### v1.2.0
 - Added options for SDR brightness
     - Gamma
