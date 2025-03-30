@@ -1,8 +1,11 @@
---v1.2.0
-local statics = require("utility/Statics")
-local TAAStrength = statics.generate("via.render.ToneMapping.TemporalAA", true)
-local localExposureType = statics.generate("via.render.ToneMapping.LocalExposureType", true)
-local lensDistortionSetting = statics.generate("via.render.RenderConfig.LensDistortionSetting", true)
+--Mod header
+local mod = {
+    name = "Disable Post Processing Effects",
+    id = "DisablePostProcessingEffects",
+    version = "1.2.1",
+    author = "TonWonton",
+    settings
+}
 
 --Default settings
 local settings =
@@ -30,6 +33,15 @@ local settings =
     lowerLimitOverlay = 0.0,
     upperLimitOverlay = 1.0,
 }
+
+mod.settings = settings
+_G[mod.id] = mod --Globalize mod header
+
+--Generate enums
+local statics = require("utility/Statics")
+local TAAStrength = statics.generate("via.render.ToneMapping.TemporalAA", true)
+local localExposureType = statics.generate("via.render.ToneMapping.LocalExposureType", true)
+local lensDistortionSetting = statics.generate("via.render.RenderConfig.LensDistortionSetting", true)
 
 local apply = false
 local save = false
@@ -80,7 +92,7 @@ local function ApplySettings()
     if initialized == false then log.info("[DISABLE POST PROCESSING] Not initialized, not applying settings") return end
 
     --Set tonemapping and LDRPostProcessing
-    tonemapping:call("setTemporalAA", settings.TAA and TAAStrength.Strong or TAAStrength.Disable)
+    tonemapping:call("setTemporalAA", settings.TAA and TAAStrength.Manual or TAAStrength.Disable)
     tonemapping:call("set_EchoEnabled", settings.jitter)
     tonemapping:call("set_EnableLocalExposure", settings.localExposure)
     tonemapping:call("setLocalExposureType", settings.localExposureBlurredLuminance and localExposureType.BlurredLuminance or localExposureType.Legacy)
@@ -167,7 +179,7 @@ re.on_frame(function() if initialized == false then Initialize() end end)
 
 --Script generated UI
 re.on_draw_ui(function()
-    if imgui.tree_node("Post Processing Settings v1.2.0") then
+    if imgui.tree_node("Post Processing Settings v1.2.1") then
         local changed = false
 
         --Save settings when clicking on save box
