@@ -2,7 +2,7 @@
 local mod = {
     name = "Disable Post Processing Effects",
     id = "DisablePostProcessingEffects",
-    version = "1.3.0",
+    version = "1.3.1",
     author = "TonWonton",
     settings
 }
@@ -23,7 +23,6 @@ local settings =
     fog = true,
     volumetricFog = true,
     customBrightnessEnable = false,
-    useSDRBrightnessOptionforOverlay = false,
     customContrast = 1.0,
     gamma = 1.0,
     gammaOverlay = 1.0,
@@ -43,13 +42,13 @@ local localExposureType = statics.generate("via.render.ToneMapping.LocalExposure
 local lensDistortionSetting = statics.generate("via.render.RenderConfig.LensDistortionSetting", true)
 
 --Singleton and manager types
-local cameraManager, cameraManagerType, graphicsManager, graphicsManagerType
+local cameraManager, cameraManagerType, graphicsManager
 --gameobject, component, and type definitions
 local camera, cameraGameObject, LDRPostProcess, colorCorrectComponent, tonemapping, tonemappingType, graphicsSetting, displaySettings
 
 local apply = false
 local initialized = false
-local loadDefaults = false
+local changeBrightness = false
 
 
 --Saves settings to json
@@ -60,12 +59,12 @@ end
 --Loads settings depending on overload and puts into table
 --0 and default = saved user config or script defaults, 1 = script defaults, 2 = game defaults
 local function LoadSettings(setting)
+    if settings.customBrightnessEnable == true then changeBrightness = true end
+
     local loadedTable
     if setting == 1 then
-        loadDefaults = true
         loadedTable = json.load_file("mhwi_disablepostprocessingeffects_defaults.json")
     elseif setting == 2 then
-        loadDefaults = true
         loadedTable = json.load_file("mhwi_disablepostprocessingeffects_game_defaults.json")
     else
         loadedTable = json.load_file("mhwi_remove_postprocessing.json")
@@ -117,7 +116,7 @@ local function ApplySettings()
     end
 
     --Set gamma and brightness depending on customBrightnessEnable and HDR
-    if settings.customBrightnessEnable == true or loadDefaults == true then
+    if settings.customBrightnessEnable == true or changeBrightness == true then
         local HDRMode = displaySettings:call("get_HDRMode")
         displaySettings:call("set_UseSDRBrightnessOptionForOverlay", true)
         displaySettings:call("set_Gamma", settings.gamma)
@@ -126,9 +125,9 @@ local function ApplySettings()
         displaySettings:call("set_OutputUpperLimit", settings.upperLimit)
         displaySettings:call("set_OutputLowerLimitForOverlay", settings.lowerLimitOverlay)
         displaySettings:call("set_OutputUpperLimitForOverlay", settings.upperLimitOverlay)
+        if settings.customBrightnessEnable == false and changeBrightness == true then displaySettings:call("set_UseSDRBrightnessOptionForOverlay", false) end
         if HDRMode == false then displaySettings:call("updateRequest") end
-        if loadDefaults == true then displaySettings:call("set_UseSDRBrightnessOptionForOverlay", false) end
-        loadDefaults = false
+        changeBrightness = false
     else
         displaySettings:call("set_UseSDRBrightnessOptionForOverlay", false)
     end
@@ -155,7 +154,6 @@ local function Initialize()
 
     --Get types
     cameraManagerType = sdk.find_type_definition("app.CameraManager")
-    graphicsManagerType = sdk.find_type_definition("app.GraphicsManager")
     log.info("[DISABLE POST PROCESSING] Singleton managers type definition get successful")
 
     --Get gameobjects, components, and type definitions
