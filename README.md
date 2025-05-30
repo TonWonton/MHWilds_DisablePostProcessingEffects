@@ -54,6 +54,9 @@ This script also lets you disable the color correction which makes the game more
 
 
 ## Changelog
+### v1.3.3
+- Made function GenerateEnum() local in order to avoid potential issues
+
 ### v1.3.2
 - Possible fix for mod not working for some after latest update/no file error
     - Code from utility/Statics.lua moved into main file. Utility folder and Statics.lua no longer included or required
