@@ -2,7 +2,7 @@
 local mod = {
     name = "Disable Post Processing Effects",
     id = "DisablePostProcessingEffects",
-    version = "1.3.1",
+    version = "1.3.2",
     author = "TonWonton",
     settings
 }
@@ -35,12 +35,8 @@ local settings =
 mod.settings = settings
 _G[mod.id] = mod --Globalize mod header
 
---Generate enums
-local statics = require("utility/Statics")
-local TAAStrength = statics.generate("via.render.ToneMapping.TemporalAA", true)
-local localExposureType = statics.generate("via.render.ToneMapping.LocalExposureType", true)
-local lensDistortionSetting = statics.generate("via.render.RenderConfig.LensDistortionSetting", true)
-
+--Enums
+local TAAStrength, localExposureType, lensDistortionSetting
 --Singleton and manager types
 local cameraManager, cameraManagerType, graphicsManager
 --gameobject, component, and type definitions
@@ -50,6 +46,34 @@ local apply = false
 local initialized = false
 local changeBrightness = false
 
+
+--Generate enums
+function GenerateEnum(typename, double_ended)
+    local double_ended = double_ended or false
+
+    local t = sdk.find_type_definition(typename)
+    if not t then return {} end
+
+    local fields = t:get_fields()
+    local enum = {}
+
+    for i, field in ipairs(fields) do
+        if field:is_static() then
+            local name = field:get_name()
+            local raw_value = field:get_data(nil)
+
+            log.info(name .. " = " .. tostring(raw_value))
+
+            enum[name] = raw_value
+
+            if double_ended then
+                enum[raw_value] = name
+            end
+        end
+    end
+
+    return enum
+end
 
 --Saves settings to json
 local function SaveSettings()
@@ -156,7 +180,7 @@ local function Initialize()
     cameraManagerType = sdk.find_type_definition("app.CameraManager")
     log.info("[DISABLE POST PROCESSING] Singleton managers type definition get successful")
 
-    --Get gameobjects, components, and type definitions
+    --Get gameobjects, components, type definitions, and enums
     camera = cameraManager:call("get_PrimaryCamera")
     cameraGameObject = camera:call("get_GameObject")
     LDRPostProcess = get_component(cameraGameObject, "via.render.LDRPostProcess")
@@ -165,7 +189,10 @@ local function Initialize()
     tonemappingType = sdk.find_type_definition("via.render.ToneMapping")
     graphicsSetting = graphicsManager:call("get_NowGraphicsSetting")
     displaySettings = graphicsManager:call("get_DisplaySettings")
-    log.info("[DISABLE POST PROCESSING] Component get successful")
+    TAAStrength = GenerateEnum("via.render.ToneMapping.TemporalAA", true)
+    localExposureType = GenerateEnum("via.render.ToneMapping.LocalExposureType", true)
+    lensDistortionSetting = GenerateEnum("via.render.RenderConfig.LensDistortionSetting", true)
+    log.info("[DISABLE POST PROCESSING] Component get and enum generation successful")
 
     --Create hooks and register callback
     sdk.hook(cameraManagerType:get_method("onSceneLoadFadeIn"), function() end, function() ApplySettings() end)
