@@ -2,7 +2,7 @@
 local mod = {
     name = "Disable Post Processing Effects",
     id = "DisablePostProcessingEffects",
-    version = "1.3.2",
+    version = "1.3.3",
     author = "TonWonton",
     settings
 }
@@ -48,7 +48,7 @@ local changeBrightness = false
 
 
 --Generate enums
-function GenerateEnum(typename, double_ended)
+local function GenerateEnum(typename, double_ended)
     local double_ended = double_ended or false
 
     local t = sdk.find_type_definition(typename)
