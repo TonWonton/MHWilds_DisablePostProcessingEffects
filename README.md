@@ -54,6 +54,21 @@ This script also lets you disable the color correction which makes the game more
 
 
 ## Changelog
+### v1.3.2
+- Possible fix for mod not working for some after latest update/no file error
+    - Code from utility/Statics.lua moved into main file. Utility folder and Statics.lua no longer included or required
+
+### v1.3.1
+- Improved load settings buttons to prevent overriding game brightness if SDR custom gamma & brightness hasn't been enabled yet
+
+### v1.3.0
+- Added buttons for loading settings
+    - Saved settings
+    - Script defaults
+    - Game defaults
+- Settings will now auto save at the same time as REFramework (when closing REF window etc.)
+- Changed UI
+
 ### v1.2.1
 - Changed TAA strength to the game default "Manual" instead of "Strong" if you have TAA enabled in the script
 - Added global mod header for better compatibility with Lite Environment and future mods
